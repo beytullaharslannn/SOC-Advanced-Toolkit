@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QTa
 from ui_components import AnimatedBackground 
 from nmap_module import NmapTab
 from web_module import WebTab
+from brute_module import BruteTab
 
 class SecurityApp(QMainWindow):
     def __init__(self):
@@ -27,9 +28,11 @@ class SecurityApp(QMainWindow):
         self.tabs = QTabWidget()
         self.nmap_tab = NmapTab()
         self.web_tab = WebTab(self)
+        self.brute_tab = BruteTab()
 
         self.tabs.addTab(self.nmap_tab, "Nmap Gelişmiş Tarama")
         self.tabs.addTab(self.web_tab, "Dizin / Web Tarama")
+        self.tabs.addTab(self.brute_tab, "Brute Force (Hydra)")
         self.ui_layout.addWidget(self.tabs)
 
     def setup_styles(self):
