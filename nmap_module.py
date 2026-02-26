@@ -2,7 +2,7 @@ import re, json
 from datetime import datetime
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QCheckBox, 
                              QPushButton, QTextEdit, QComboBox, QTableWidget, QTableWidgetItem, 
-                             QHeaderView, QMenu, QFileDialog, QTabWidget)
+                             QHeaderView, QMenu, QFileDialog, QTabWidget, QSystemTrayIcon, QStyle)
 from PyQt6.QtGui import QBrush, QColor, QTextDocument, QPdfWriter
 from PyQt6.QtCore import Qt
 from scanner_threads import ScannerThread
@@ -44,7 +44,7 @@ class NmapTab(QWidget):
         row_opts.addWidget(self.timing_combo); row_opts.addWidget(self.script_combo)
         left_layout.addLayout(row_opts)
         
-        # Checkboxlar (Tümü eklendi)
+        # Checkboxlar
         self.chk_sS = QCheckBox("-sS (Syn Scan)"); self.chk_sS.stateChanged.connect(self.update_live_preview)
         self.chk_sV = QCheckBox("-sV (Version)"); self.chk_sV.stateChanged.connect(self.update_live_preview)
         self.chk_sC = QCheckBox("-sC (Default Scripts)"); self.chk_sC.stateChanged.connect(self.update_live_preview)
@@ -98,6 +98,11 @@ class NmapTab(QWidget):
         
         layout.addWidget(left_panel); layout.addLayout(right_container, 3)
         self.update_live_preview()
+        
+        # BİLDİRİM SİSTEMİ BAŞLATMA
+        self.tray_icon = QSystemTrayIcon(self)
+        self.tray_icon.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon))
+        self.tray_icon.show()
 
     def log_event(self, text):
         now = datetime.now().strftime("%H:%M:%S")
@@ -119,7 +124,7 @@ class NmapTab(QWidget):
         if self.custom_input.text(): cmd += f"{self.custom_input.text()} "
         self.live_preview.setHtml(f"<span style='color:#00ff00'><b>{cmd}</b></span> <span style='color:#ff4500'>{target}</span>")
 
-    def apply_scan_profile(self, index): # 'index' argümanı eklendi (currentIndexChanged için)
+    def apply_scan_profile(self, index):
         p = self.profile_combo.currentText()
         for chk in self.checks: chk.setChecked(False)
         if p == "Quick Scan": self.custom_input.setText("-F"); self.timing_combo.setCurrentText("T4")
@@ -154,6 +159,8 @@ class NmapTab(QWidget):
         if out: 
             self.parse_table(out)
             self.log_event("Tarama başarıyla tamamlandı.")
+            # BİLDİRİM FIRLATILIYOR:
+            self.tray_icon.showMessage("🛡️ Nmap Tarama", "Tarama başarıyla tamamlandı!", QSystemTrayIcon.MessageIcon.Information, 3000)
         else:
             self.log_event("Tarama durduruldu veya hata oluştu.")
 
@@ -178,13 +185,15 @@ class NmapTab(QWidget):
                 self.port_input.setText(port); self.chk_A.setChecked(True); self.start_scan()
 
     def export_pdf(self):
-        f, _ = QFileDialog.getSaveFileName(self, "PDF Kaydet", "", "PDF Files (*.pdf)")
+        options = QFileDialog.Option.DontUseNativeDialog
+        f, _ = QFileDialog.getSaveFileName(self, "PDF Kaydet", "", "PDF Files (*.pdf)", options=options)
         if f:
             doc = QTextDocument(); doc.setHtml(f"<h1>Nmap Raporu</h1><p>Hedef: {self.target_input.text()}</p><hr>" + self.terminal.toHtml())
             writer = QPdfWriter(f); doc.print(writer); self.log_event(f"Rapor Kaydedildi: {f}")
 
     def export_json(self):
-        f, _ = QFileDialog.getSaveFileName(self, "JSON Kaydet", "", "JSON Files (*.json)")
+        options = QFileDialog.Option.DontUseNativeDialog
+        f, _ = QFileDialog.getSaveFileName(self, "JSON Kaydet", "", "JSON Files (*.json)", options=options)
         if f:
             with open(f, 'w') as jf: json.dump({"target": self.target_input.text(), "date": str(datetime.now()), "raw_output": self.terminal.toPlainText()}, jf, indent=4)
             self.log_event(f"Veriler Kaydedildi: {f}")
