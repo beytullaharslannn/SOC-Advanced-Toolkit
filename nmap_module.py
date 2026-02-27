@@ -9,8 +9,9 @@ from scanner_threads import ScannerThread
 from ui_components import ModernPanel
 
 class NmapTab(QWidget):
-    def __init__(self):
+    def __init__(self, cve_tab_ref=None): # BURAYA PARAMETRE EKLENDİ
         super().__init__()
+        self.cve_tab_ref = cve_tab_ref # REFERANSI KAYDEDİYORUZ
         self.nmap_thread = None
         self.init_ui()
 
@@ -179,11 +180,33 @@ class NmapTab(QWidget):
     def show_port_context_menu(self, pos):
         item = self.table.itemAt(pos)
         if item:
-            port = self.table.item(item.row(), 0).text().split("/")[0]
-            menu = QMenu(self); menu.setStyleSheet("QMenu { background:#2a2a35; color:white; }")
-            if menu.exec(self.table.mapToGlobal(pos)) == menu.addAction(f"Port {port} Detaylı Analiz"):
-                self.port_input.setText(port); self.chk_A.setChecked(True); self.start_scan()
-
+            row = item.row()
+            port = self.table.item(row, 0).text().split("/")[0]
+            service = self.table.item(row, 2).text() # Tablodan servis adını çeker
+            version = self.table.item(row, 3).text() # Tablodan versiyonu çeker
+            
+            menu = QMenu(self)
+            menu.setStyleSheet("QMenu { background:#2a2a35; color:white; }")
+            
+            # Seçenek 1: Eski özelliğin
+            act_analyze = menu.addAction(f"Port {port} Detaylı Analiz")
+            
+            # Seçenek 2: YENİ EKLENEN CVE ARAMASI
+            search_term = f"{service} {version}".strip()
+            act_cve = menu.addAction(f"🔍 '{search_term}' için CVE Ara")
+            
+            action = menu.exec(self.table.mapToGlobal(pos))
+            
+            if action == act_analyze:
+                self.port_input.setText(port)
+                self.chk_A.setChecked(True)
+                self.start_scan()
+            elif action == act_cve and self.cve_tab_ref:
+                # KANKA: Tıklanınca aramayı CVE sekmesine gönderir
+                self.cve_tab_ref.external_search(search_term)
+                # Ekranı otomatik olarak CVE sekmesine kaydırır (Index 1)
+                self.parentWidget().parentWidget().setCurrentIndex(1)
+                
     def export_pdf(self):
         options = QFileDialog.Option.DontUseNativeDialog
         f, _ = QFileDialog.getSaveFileName(self, "PDF Kaydet", "", "PDF Files (*.pdf)", options=options)
