@@ -11,5 +11,5 @@ cd SOC-Advanced-Toolkit
 # Gerekli bağımlılıkları yükleyin
 pip install -r requirements.txt
 
-# Calıştırın
+# Çalıştırın
 python3 main.py
