@@ -8,5 +8,9 @@ cd SOC-Advanced-Toolkit
 pip install -r requirements.txt
 # Çalıştırın
 python3 main.py
-<img width="1161" height="856" alt="image" src="https://github.com/user-attachments/assets/87029de8-3122-4ec7-a887-14b61c908e3b" />
-<img width="1151" height="858" alt="image" src="https://github.com/user-attachments/assets/bccae941-c5e3-476f-8e81-46fdf3e7489b" />
+<img width="1225" height="860" alt="image" src="https://github.com/user-attachments/assets/716f1094-fa17-44bd-9447-ebbee60456e0" />
+<img width="1220" height="863" alt="image" src="https://github.com/user-attachments/assets/00a6421e-b1d7-4c77-8509-d94927c1a72c" />
+<img width="1226" height="870" alt="image" src="https://github.com/user-attachments/assets/1376a085-29c2-4979-a042-16284d3aa3c6" />
+<img width="1223" height="863" alt="image" src="https://github.com/user-attachments/assets/beec9015-4f12-4cca-a13d-0b25f03aaaba" />
+<img width="1231" height="868" alt="image" src="https://github.com/user-attachments/assets/b47bfd3a-0935-4bd4-8a37-829c369158d5" />
+
