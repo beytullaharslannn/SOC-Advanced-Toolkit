@@ -6,6 +6,7 @@ from nmap_module import NmapTab
 from web_module import WebTab
 from brute_module import BruteTab
 from cve_module import CVETab
+from crypto_module import CryptoTab
 class SecurityApp(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -26,20 +27,20 @@ class SecurityApp(QMainWindow):
         self.setup_styles()
 
         self.tabs = QTabWidget()
-        
         # ÖNCE CVE TAB'INI OLUŞTURUYORUZ
         self.cve_tab = CVETab()
-        
         # SONRA NMAP TAB'INA BU REFERANSI (KÖPRÜYÜ) VERİYORUZ
         self.nmap_tab = NmapTab(self.cve_tab) 
-        
         self.web_tab = WebTab(self)
         self.brute_tab = BruteTab()
+        self.crypto_tab = CryptoTab()
+        
         
         self.tabs.addTab(self.nmap_tab, "Nmap Gelişmiş Tarama")
         self.tabs.addTab(self.cve_tab, "CVE Araştırma")
         self.tabs.addTab(self.web_tab, "Dizin / Web Tarama")
         self.tabs.addTab(self.brute_tab, "Brute Force (Hydra)")
+        self.tabs.addTab(self.crypto_tab, "Kriptografi & CTF")
         self.ui_layout.addWidget(self.tabs)
 
     def setup_styles(self):
