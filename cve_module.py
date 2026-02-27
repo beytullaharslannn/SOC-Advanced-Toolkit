@@ -48,12 +48,25 @@ class CVEFetchThread(QThread):
                 score    = "N/A"
                 severity = "N/A"
                 metrics  = cve.get("metrics", {})
+                # CVSS Skoru + Severity
+                score    = "N/A"
+                severity = "N/A"
+                metrics  = cve.get("metrics", {})
                 for key in ["cvssMetricV31", "cvssMetricV30", "cvssMetricV2"]:
                     if key in metrics and metrics[key]:
                         cvss_data = metrics[key][0].get("cvssData", {})
                         score     = str(cvss_data.get("baseScore", "N/A"))
                         severity  = metrics[key][0].get("baseSeverity",
-                                      cvss_data.get("baseSeverity", "N/A"))
+                                              cvss_data.get("baseSeverity", "N/A"))
+                        
+                        # --- KANKA PATCH BAŞLANGICI ---
+                        try:
+                            if float(score) >= 9.0:
+                                severity = "CRITICAL"
+                        except ValueError:
+                            pass 
+                        # --- KANKA PATCH BİTİŞİ ---
+                        
                         break
 
                 # Yayın Tarihi
